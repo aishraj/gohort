@@ -62,5 +62,29 @@ func StoreUrl(baseUrl string) (string, error) {
 	}
 
 	return EncodeToBase(idNumber)
+}
 
+func ForceStoreUrl(baseUrl string, desiredAlias string) (string, error) {
+	//Map and store this baseUrl. Return the alias string.
+	//Before storing we increase the value of the global counter by 1
+	c, err := setupRedisConnection(10)
+	performErrorCheck(err)
+	defer c.Close()
+
+	res := c.Cmd("incr", "globalCounter")
+	performErrorCheck(res.Err)
+
+	currentCounter := res.String()
+
+	idNumber, err := strconv.ParseUint(currentCounter, 10, 64)
+	performErrorCheck(err)
+
+	setREsp, err := c.Cmd("setnx", idNumber, baseUrl).Bool()
+	performErrorCheck(err)
+
+	if setREsp == false {
+		fmt.Println("The ID already exits. ERROR!!")
+	}
+
+	return EncodeToBase(idNumber)
 }
