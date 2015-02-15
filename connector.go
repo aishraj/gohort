@@ -16,7 +16,8 @@ func setupRedisConnection(timeOutSeconds int) (*redis.Client, error) {
 func performErrorCheck(err error) {
 	if err != nil {
 		//TODO: Need to use logging instead.
-		fmt.Println("Error while setting a redis connection")
+		fmt.Println("Error while setting a redis connection. Error is ", err)
+		os.Exit(1)
 	}
 }
 
@@ -44,38 +45,19 @@ func StoreUrl(baseUrl string) (string, error) {
 	c, err := setupRedisConnection(10)
 	performErrorCheck(err)
 	defer c.Close()
-	//need to do this in a transaction
-	// first get the current value
-	// increment the current value
-	rep := c.Cmd("multi")
-	performErrorCheck(rep.Err)
 
-	currentCounter, err := c.Cmd("get", "globalCounter").Str()
+	res := c.Cmd("incr", "globalCounter")
+	performErrorCheck(res.Err)
 
-	if err != nil {
-		fmt.Println("ERROR. Cannot get the current counter")
-		os.Exit(1)
-	}
-
-	if currentCounter == "" {
-		resp := c.Cmd("set", "globalCounter", "1")
-		currentCounter = "1"
-		performErrorCheck(resp.Err)
-	} else {
-		res := c.Cmd("incr", "globalCounter")
-		performErrorCheck(res.Err)
-	}
-
-	rep = c.Cmd("exec")
-	performErrorCheck(rep.Err)
+	currentCounter := res.String()
 
 	idNumber, err := strconv.ParseUint(currentCounter, 10, 64)
 	performErrorCheck(err)
 
-	res, err := c.Cmd("setnx", idNumber).Bool()
+	setREsp, err := c.Cmd("setnx", idNumber, baseUrl).Bool()
 	performErrorCheck(err)
 
-	if res == false {
+	if setREsp == false {
 		fmt.Println("The ID already exits. ERROR!!")
 	}
 
