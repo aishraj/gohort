@@ -1,10 +1,16 @@
 package khukuri
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
 	"net/http"
 )
+
+type UrlMsg struct {
+	Url          string `json:shorturl`
+	ErrorMessage string `json:errorMessage`
+}
 
 func RegisterAndStart() {
 	r := mux.NewRouter()
@@ -27,7 +33,6 @@ func RootHandler(rw http.ResponseWriter, r *http.Request) {
 }
 
 func RedirectToBaseHandler(rw http.ResponseWriter, r *http.Request) {
-	//fmt.Fprint(rw, "Redirect handler")
 	vars := mux.Vars(r)
 	baseUrl, ok := LookupAlias(vars["alias"])
 	if ok != nil {
@@ -43,29 +48,34 @@ func RedirectToBaseHandler(rw http.ResponseWriter, r *http.Request) {
 }
 
 func AliasHandler(rw http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(rw, "AliasHandler handler ")
-	baseUrl := ExtractBaseUrl(r)
-	fmt.Fprint(rw, baseUrl)
-
+	baseUrl, ok := ExtractBaseUrl(r)
+	urlMessage := UrlMsg{"", ""}
+	if ok == nil {
+		urlMessage = UrlMsg{baseUrl, ""}
+	} else {
+		urlMessage = UrlMsg{baseUrl, ok.Error()}
+	}
+	js, _ := json.Marshal(urlMessage)
+	rw.Header().Set("Content-Type", "application/json")
+	rw.Write(js)
 }
 
-func ExtractBaseUrl(r *http.Request) string {
+func ExtractBaseUrl(r *http.Request) (string, error) {
 	alias := extractParam(r, "alias")
-	baseUrl, ok := LookupAlias(alias)
-	if ok != nil {
-		fmt.Println("ERROR: ", ok)
-	}
-	return baseUrl
+	return LookupAlias(alias)
 }
 
 func BaseHandler(rw http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(rw, "BaseHandler handler ")
 	baseUrl := extractParam(r, "base")
 	alias, ok := StoreUrl(baseUrl)
 	if ok != nil {
-		fmt.Println("ERROR: ", ok)
+		http.Error(rw, ok.Error(), http.StatusInternalServerError)
+	} else {
+		urlMessage := UrlMsg{alias, ""}
+		js, _ := json.Marshal(urlMessage)
+		rw.Header().Set("Content-Type", "application/json")
+		rw.Write(js)
 	}
-	fmt.Fprint(rw, alias)
 }
 
 func AliasMatcher(r *http.Request, rm *mux.RouteMatch) bool {
