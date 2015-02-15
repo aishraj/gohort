@@ -1,10 +1,7 @@
 package khukuri
 
-//import "github.com/fzzy/radix/redis"
-//import "github.com/gorilla/mux"
 import (
 	"errors"
-	//"fmt"
 	"strings"
 )
 
