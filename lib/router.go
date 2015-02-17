@@ -40,11 +40,13 @@ func RegisterAndStart(redisHost string, redisPort string, serverPort string, tim
 }
 
 func RootHandler(rw http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(rw, "Welcome to the gorkha URL shortner v0.01")
+	log.Println(r.UserAgent(), "  ", r.Method)
+	fmt.Fprint(rw, "Welcome to the gohort URL shortner v0.01")
 }
 
 func RedirectToBaseHandler(rw http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
+	log.Println(r.UserAgent(), "  ", r.Method, r.URL)
 	c, err := SetupRedisConnection(hostRedis, portRedis, timeOutRedis)
 	if err != nil {
 		log.Fatal("Unable to setup a redis connection", err)
@@ -65,7 +67,7 @@ func RedirectToBaseHandler(rw http.ResponseWriter, r *http.Request) {
 }
 
 func AliasHandler(rw http.ResponseWriter, r *http.Request) {
-
+	log.Println(r.UserAgent(), "  ", r.Method, r.URL)
 	c, err := SetupRedisConnection(hostRedis, portRedis, timeOutRedis)
 	if err != nil {
 		log.Fatal("Unable to setup a redis connection", err)
@@ -89,7 +91,7 @@ func ExtractBaseUrl(r *http.Request, c *redis.Client) (string, error) {
 }
 
 func BaseHandler(rw http.ResponseWriter, r *http.Request) {
-
+	log.Println(r.UserAgent(), "  ", r.Method, r.URL)
 	c, err := SetupRedisConnection(hostRedis, portRedis, timeOutRedis)
 	if err != nil {
 		log.Fatal("Unable to setup a redis connection", err)
