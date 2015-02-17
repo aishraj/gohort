@@ -30,6 +30,18 @@ func CheckSum(id uint64) uint64 {
 	return checkSum % 10
 }
 
+func IsCheckSumValid(id uint64) bool {
+	return CheckSum(id) == 0
+}
+
+func CalculateCheckDigit(partialId uint64) uint64 {
+	checkDigit := CheckSum(partialId * 10)
+	if checkDigit == 0 {
+		return checkDigit
+	}
+	return 10 - checkDigit
+}
+
 func digitSum(num uint64) uint64 {
 	retNum := uint64(0)
 	for num > 0 {
