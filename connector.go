@@ -1,6 +1,7 @@
 package khukuri
 
 import (
+	"errors"
 	"fmt"
 	"github.com/fzzy/radix/redis"
 	"os"
@@ -25,6 +26,10 @@ func LookupAlias(alias string) (string, error) {
 	c, err := setupRedisConnection(10)
 	performErrorCheck(err)
 	defer c.Close()
+	if !ValidateAlias(alias) {
+		return "", errors.New("Unable to validate the lookup string.")
+	}
+	alias = alias[1:]
 	lookupId, err := DecodeFromBase(alias)
 	if err != nil {
 		fmt.Println("ERROR!!!!! Can't convert string id")
@@ -59,7 +64,14 @@ func StoreUrl(baseUrl string) (string, error) {
 
 	if setREsp == false {
 		fmt.Println("The ID already exits. ERROR!!")
+		//TODO: Need to end the program here. ?
 	}
 
-	return EncodeToBase(idNumber)
+	encodedAlias, ok := EncodeToBase(idNumber)
+	if ok != nil {
+		return "", ok
+	}
+	checkDigit := CalculateCheckDigit(idNumber)
+	checkDigitStr := strconv.FormatUint(checkDigit, 10)
+	return checkDigitStr + encodedAlias, nil
 }

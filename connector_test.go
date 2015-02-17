@@ -17,7 +17,7 @@ func TestConnectorSet(t *testing.T) {
 func TestConnectorGet(t *testing.T) {
 	//Okay need a better way to do this.
 	// Shouldn't be connecting to redis.
-	a, ok := LookupAlias("33")
+	a, ok := LookupAlias("1c")
 	if ok != nil {
 		fmt.Println(ok)
 		t.Fail()

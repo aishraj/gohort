@@ -44,3 +44,18 @@ func digitSum(num uint64) uint64 {
 	}
 	return retNum
 }
+
+func ValidateAlias(alias string) bool {
+	if len(alias) < 2 || alias[0] < '0' || alias[0] > '9' {
+		return false
+	}
+	checkDigit := string(alias[0])
+	checkDigitNum, _ := strconv.ParseUint(checkDigit, 10, 64)
+	actualAlias := string(alias[1:])
+	aliasId, ok := DecodeFromBase(actualAlias)
+	if ok != nil {
+		//TODO log
+		return false
+	}
+	return CalculateCheckDigit(aliasId) == checkDigitNum
+}

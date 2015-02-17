@@ -29,15 +29,17 @@ func RegisterAndStart() {
 }
 
 func RootHandler(rw http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(rw, "RootHandler handler")
+	fmt.Fprint(rw, "Welcome to the gorkha URL shortner v0.01")
 }
 
 func RedirectToBaseHandler(rw http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	baseUrl, ok := LookupAlias(vars["alias"])
 	if ok != nil {
+		//TODO: Need to provide better logging.
 		fmt.Println("Error while redirecting")
 		fmt.Println(ok)
+		http.NotFound(rw, r)
 	}
 	if baseUrl != "" {
 		http.Redirect(rw, r, baseUrl, http.StatusMovedPermanently)
