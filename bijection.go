@@ -2,11 +2,43 @@ package khukuri
 
 import (
 	"errors"
+	"strconv"
 	"strings"
 )
 
 const alphaBetSet = "23456789bcdfghjkmnpqrstvwxyzBCDFGHJKLMNPQRSTVWXYZ-_"
 const base = uint64(len(alphaBetSet))
+
+func CheckSum(id uint64) uint64 {
+	numStr := strconv.FormatUint(id, 10)
+	runes := []rune(numStr)
+	checkSum := uint64(0)
+	oddSum := uint64(0)
+	evenSum := uint64(0)
+	for i := len(runes) - 1; i >= 0; i-- {
+		item := runes[i]
+		digitNum := uint64(item - '0')
+		ii := i - len(runes) + 1
+		if ii%2 == 0 {
+			evenSum += digitNum
+		} else {
+			sumOfDigits := digitSum(2 * digitNum)
+			oddSum += sumOfDigits
+		}
+	}
+	checkSum = evenSum + oddSum
+	return checkSum % 10
+}
+
+func digitSum(num uint64) uint64 {
+	retNum := uint64(0)
+	for num > 0 {
+		r := num % 10
+		retNum += r
+		num = num / 10
+	}
+	return retNum
+}
 
 func EncodeToBase(seedNumber uint64) (string, error) {
 	encodedString := ""
