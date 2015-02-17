@@ -8,5 +8,5 @@ func TestRouter(t *testing.T) {
 	}
 	//TODO: Need to figure out a better way to test this
 	//httptest seems fine but I'm not yet fully convinced about its use with gorilla/mux.
-	RegisterAndStart()
+	RegisterAndStart("localhost", "6379", "8090", 10)
 }

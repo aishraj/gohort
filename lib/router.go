@@ -3,7 +3,9 @@ package khukuri
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/fzzy/radix/redis"
 	"github.com/gorilla/mux"
+	"log"
 	"net/http"
 )
 
@@ -12,7 +14,16 @@ type UrlMsg struct {
 	ErrorMessage string `json:errorMessage`
 }
 
-func RegisterAndStart() {
+var hostRedis string = ""
+var portRedis string = ""
+var timeOutRedis int = 10
+
+func RegisterAndStart(redisHost string, redisPort string, serverPort string, timeOutSeconds int) {
+	hostRedis = redisHost
+	portRedis = redisPort
+	timeOutRedis = timeOutSeconds
+	serverPort = ":" + serverPort
+
 	r := mux.NewRouter()
 	r.HandleFunc("/", RootHandler)
 
@@ -23,8 +34,8 @@ func RegisterAndStart() {
 	api.Methods("GET").MatcherFunc(AliasMatcher).HandlerFunc(AliasHandler)
 	api.Methods("POST").MatcherFunc(BaseMatcher).HandlerFunc(BaseHandler)
 
-	fmt.Println("Server starting on port 8080")
-	http.ListenAndServe(":8080", r)
+	log.Println("Server starting on port ", serverPort)
+	log.Fatal(http.ListenAndServe(serverPort, r))
 
 }
 
@@ -34,11 +45,15 @@ func RootHandler(rw http.ResponseWriter, r *http.Request) {
 
 func RedirectToBaseHandler(rw http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	baseUrl, ok := LookupAlias(vars["alias"])
+	c, err := SetupRedisConnection(hostRedis, portRedis, timeOutRedis)
+	if err != nil {
+		log.Fatal("Unable to setup a redis connection", err)
+	}
+
+	baseUrl, ok := LookupAlias(vars["alias"], c)
 	if ok != nil {
-		//TODO: Need to provide better logging.
-		fmt.Println("Error while redirecting")
-		fmt.Println(ok)
+		log.Println("Error while redirecting")
+		log.Println(ok)
 		http.NotFound(rw, r)
 	}
 	if baseUrl != "" {
@@ -50,7 +65,13 @@ func RedirectToBaseHandler(rw http.ResponseWriter, r *http.Request) {
 }
 
 func AliasHandler(rw http.ResponseWriter, r *http.Request) {
-	baseUrl, ok := ExtractBaseUrl(r)
+
+	c, err := SetupRedisConnection(hostRedis, portRedis, timeOutRedis)
+	if err != nil {
+		log.Fatal("Unable to setup a redis connection", err)
+	}
+
+	baseUrl, ok := ExtractBaseUrl(r, c)
 	urlMessage := UrlMsg{"", ""}
 	if ok == nil {
 		urlMessage = UrlMsg{baseUrl, ""}
@@ -62,14 +83,20 @@ func AliasHandler(rw http.ResponseWriter, r *http.Request) {
 	rw.Write(js)
 }
 
-func ExtractBaseUrl(r *http.Request) (string, error) {
+func ExtractBaseUrl(r *http.Request, c *redis.Client) (string, error) {
 	alias := extractParam(r, "alias")
-	return LookupAlias(alias)
+	return LookupAlias(alias, c)
 }
 
 func BaseHandler(rw http.ResponseWriter, r *http.Request) {
+
+	c, err := SetupRedisConnection(hostRedis, portRedis, timeOutRedis)
+	if err != nil {
+		log.Fatal("Unable to setup a redis connection", err)
+	}
+
 	baseUrl := extractParam(r, "base")
-	alias, ok := StoreUrl(baseUrl)
+	alias, ok := StoreUrl(baseUrl, c)
 	if ok != nil {
 		http.Error(rw, ok.Error(), http.StatusInternalServerError)
 	} else {

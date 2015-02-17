@@ -4,27 +4,25 @@ import (
 	"errors"
 	"fmt"
 	"github.com/fzzy/radix/redis"
-	"os"
+	"log"
 	"strconv"
 	"time"
 )
 
-func setupRedisConnection(timeOutSeconds int) (*redis.Client, error) {
-	//TODO: Read these values from some config file of sorts.
-	return redis.DialTimeout("tcp", "127.0.0.1:6379", time.Duration(timeOutSeconds)*time.Second)
+func SetupRedisConnection(serverHost string, serverport string, timeOutSeconds int) (*redis.Client, error) {
+	c, err := redis.DialTimeout("tcp",
+		serverHost+":"+serverport, time.Duration(timeOutSeconds)*time.Second)
+	performErrorCheck(err)
+	return c, err
 }
 
 func performErrorCheck(err error) {
 	if err != nil {
-		//TODO: Need to use logging instead.
-		fmt.Println("Error while setting a redis connection. Error is ", err)
-		os.Exit(1)
+		log.Fatal("Error while setting a redis connection. Error is ", err)
 	}
 }
 
-func LookupAlias(alias string) (string, error) {
-	c, err := setupRedisConnection(10)
-	performErrorCheck(err)
+func LookupAlias(alias string, c *redis.Client) (string, error) {
 	defer c.Close()
 	if !ValidateAlias(alias) {
 		return "", errors.New("Unable to validate the lookup string.")
@@ -44,11 +42,7 @@ func LookupAlias(alias string) (string, error) {
 
 }
 
-func StoreUrl(baseUrl string) (string, error) {
-	//Map and store this baseUrl. Return the alias string.
-	//Before storing we increase the value of the global counter by 1
-	c, err := setupRedisConnection(10)
-	performErrorCheck(err)
+func StoreUrl(baseUrl string, c *redis.Client) (string, error) {
 	defer c.Close()
 
 	res := c.Cmd("incr", "globalCounter")

@@ -1,7 +1,7 @@
 package khukuri
 
 import "testing"
-import "fmt"
+import "log"
 
 func TestEnCode(t *testing.T) {
 	actual, err := EncodeToBase(6657949)
@@ -26,7 +26,7 @@ func TestDecode(t *testing.T) {
 		t.Error("Expecting NO error while trying to decode 5N6. Got ", err)
 	}
 	if result != 6657949 {
-		fmt.Println(result)
+		log.Println(result)
 		t.Fail()
 	}
 }
