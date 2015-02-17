@@ -7,6 +7,23 @@ Its design is based out the [Stack Overflow question](https://stackoverflow.com/
 
 It provides a RESTful API to create and retrive short URL and their corresponding expanded forms.
 
+Running Gohort
+=================
+
+Gohort requires a working Redis installation.
+
+Once you have a working Redis installation, go get the project from Github.
+
+```go get github.com/aishraj/gohort```
+
+Now change into the project directory and run 
+```go build```
+
+Next run the executable
+
+```./gohort -cpus=1 -rhost="localhost" -rport=6379 -sport=8090 -timeout=10```
+
+
 Example
 ===================
 In order to create a new short URL:
