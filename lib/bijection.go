@@ -1,4 +1,4 @@
-package khukuri
+package gohort 
 
 import (
 	"errors"
