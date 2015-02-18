@@ -2,7 +2,7 @@ package main
 
 import (
 	"flag"
-	gohort "github.com/aishraj/gohort/lib"
+	gohort "github.com/aishraj/gohort/shortner"
 	"log"
 	"runtime"
 	"strconv"
