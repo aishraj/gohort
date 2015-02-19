@@ -1,4 +1,4 @@
-package gohort 
+package shortner
 
 import "testing"
 import "log"
