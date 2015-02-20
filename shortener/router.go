@@ -1,4 +1,4 @@
-package shortner
+package shortener
 
 import (
 	"encoding/json"
@@ -27,8 +27,8 @@ func RegisterAndStart(redisHost string, redisPort string, serverPort string, tim
 	r := mux.NewRouter()
 	r.HandleFunc("/", RootHandler)
 
-	gohort := r.Path("/{alias}").Subrouter()
-	gohort.Methods("GET").HandlerFunc(RedirectToBaseHandler)
+	shortener := r.Path("/{alias}").Subrouter()
+	shortener.Methods("GET").HandlerFunc(RedirectToBaseHandler)
 
 	api := r.PathPrefix("/api/v1/").Subrouter()
 	api.Methods("GET").MatcherFunc(AliasMatcher).HandlerFunc(AliasHandler)
@@ -41,7 +41,7 @@ func RegisterAndStart(redisHost string, redisPort string, serverPort string, tim
 
 func RootHandler(rw http.ResponseWriter, r *http.Request) {
 	log.Println(r.UserAgent(), "  ", r.Method)
-	fmt.Fprint(rw, "Welcome to the gohort URL gohort v0.01")
+	fmt.Fprint(rw, "Welcome to the shortener URL shortener v0.01")
 }
 
 func RedirectToBaseHandler(rw http.ResponseWriter, r *http.Request) {

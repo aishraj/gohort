@@ -1,4 +1,4 @@
-package shortner
+package shortener
 
 import (
 	"log"

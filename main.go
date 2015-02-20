@@ -2,7 +2,7 @@ package main
 
 import (
 	"flag"
-	"github.com/aishraj/gohort/shortner"
+	"github.com/aishraj/gohort/shortener"
 	"log"
 	"runtime"
 	"strconv"
@@ -27,5 +27,5 @@ func main() {
 		"Redis port number %s Redis Timeout seconds %d HTTP Server port %s",
 		*redisHost, redisPort, *redisTimeOutSeconds, serverPort)
 
-	shortner.RegisterAndStart(*redisHost, redisPort, serverPort, *redisTimeOutSeconds)
+	shortener.RegisterAndStart(*redisHost, redisPort, serverPort, *redisTimeOutSeconds)
 }
