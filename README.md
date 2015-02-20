@@ -32,5 +32,5 @@ In order to create a new short URL:
 
 In order to retrive the original URL from the shortend URL:
 
-```curl http://localhost:8080/api/v1/\?alias=8CQ```
+```curl http://localhost:8080/api/v1/?alias=8CQ```
 
