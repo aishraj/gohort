@@ -1,0 +1,4 @@
+language: go
+script: go get github.com/fzzy/radix/redis && go get github.com/aishraj/gohort && go test
+notifications:
+  email: false
