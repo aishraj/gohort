@@ -1,7 +1,7 @@
 Gohort
 ==================
 
-Gohort  is a simple URL shortner written in Go.
+Gohort  is a simple URL shortener written in Go.
 
 Its design is based out the [Stack Overflow question](https://stackoverflow.com/questions/742013/how-to-code-a-url-shortener) about writing a URL shortner. It uses [gorilla/mux](http://www.gorillatoolkit.org/pkg/mux) for routing requests. 
 
@@ -19,7 +19,7 @@ Once you have a working Redis installation, go get the project from Github.
 Now change into the project directory and run 
 ```go build```
 
-Next run the executable
+Next run the executable connecting to a local Redis installation:
 
 ```./gohort -cpus=1 -rhost="localhost" -rport=6379 -sport=8090 -timeout=10```
 
