@@ -9,10 +9,11 @@ import (
 	"time"
 )
 
-func SetupRedisConnection(serverHost string, serverport string, timeOutSeconds int) (*redis.Client, error) {
+func SetupRedisConnection(serverHost string, serverDb string, serverport string, timeOutSeconds int) (*redis.Client, error) {
 	c, err := redis.DialTimeout("tcp",
 		serverHost+":"+serverport, time.Duration(timeOutSeconds)*time.Second)
 	performErrorCheck(err)
+	c.Cmd("SELECT", serverDb)
 	return c, err
 }
 
