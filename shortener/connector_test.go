@@ -6,7 +6,7 @@ import "fmt"
 func TestConnectorSet(t *testing.T) {
 	//Okay need a better way to do this.
 	// Shouldn't be connecting to redis.
-	c, err := SetupRedisConnection("localhost", "6379", 10)
+	c, err := SetupRedisConnection("localhost", 0, "6379", 10)
 	if err != nil {
 		fmt.Println("Error getting redis connections")
 	}
@@ -22,7 +22,7 @@ func TestConnectorGet(t *testing.T) {
 	//Okay need a better way to do this.
 	// Shouldn't be connecting to redis.
 
-	c, err := SetupRedisConnection("localhost", "6379", 10)
+	c, err := SetupRedisConnection("localhost", 0, "6379", 10)
 	if err != nil {
 		fmt.Println("Error getting redis connections")
 	}

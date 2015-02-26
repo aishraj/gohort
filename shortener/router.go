@@ -15,11 +15,13 @@ type UrlMsg struct {
 }
 
 var hostRedis string = ""
+var dbRedis string = ""
 var portRedis string = ""
 var timeOutRedis int = 10
 
-func RegisterAndStart(redisHost string, redisPort string, serverPort string, timeOutSeconds int) {
+func RegisterAndStart(redisHost string, redisDatabase string, redisPort string, serverPort string, timeOutSeconds int) {
 	hostRedis = redisHost
+	dbRedis = redisDatabase
 	portRedis = redisPort
 	timeOutRedis = timeOutSeconds
 	serverPort = ":" + serverPort
@@ -47,7 +49,7 @@ func RootHandler(rw http.ResponseWriter, r *http.Request) {
 func RedirectToBaseHandler(rw http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	log.Println(r.UserAgent(), "  ", r.Method, r.URL)
-	c, err := SetupRedisConnection(hostRedis, portRedis, timeOutRedis)
+	c, err := SetupRedisConnection(hostRedis, dbRedis, portRedis, timeOutRedis)
 	if err != nil {
 		log.Fatal("Unable to setup a redis connection", err)
 	}
@@ -68,7 +70,7 @@ func RedirectToBaseHandler(rw http.ResponseWriter, r *http.Request) {
 
 func AliasHandler(rw http.ResponseWriter, r *http.Request) {
 	log.Println(r.UserAgent(), "  ", r.Method, r.URL)
-	c, err := SetupRedisConnection(hostRedis, portRedis, timeOutRedis)
+	c, err := SetupRedisConnection(hostRedis, dbRedis, portRedis, timeOutRedis)
 	if err != nil {
 		log.Fatal("Unable to setup a redis connection", err)
 	}
@@ -92,7 +94,7 @@ func ExtractBaseUrl(r *http.Request, c *redis.Client) (string, error) {
 
 func BaseHandler(rw http.ResponseWriter, r *http.Request) {
 	log.Println(r.UserAgent(), "  ", r.Method, r.URL)
-	c, err := SetupRedisConnection(hostRedis, portRedis, timeOutRedis)
+	c, err := SetupRedisConnection(hostRedis, dbRedis, portRedis, timeOutRedis)
 	if err != nil {
 		log.Fatal("Unable to setup a redis connection", err)
 	}
